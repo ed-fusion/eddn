@@ -1,0 +1,40 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - deploy
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Rsync Deploy
+        uses: burnett01/rsync-deployments@5.2
+        with:
+          switches: -avzr --delete --exclude="" --include="" --filter=""
+          path: ./build/*
+          remote_path: ${{ secrets.AWS_DEPLOY_PATH }}
+          remote_host: ${{ secrets.AWS_DEPLOY_HOST }}
+          remote_user: ${{ secrets.AWS_DEPLOY_USER }}
+          remote_key: ${{ secrets.AWS_DEPLOY_KEY }}
+      - name: After Deploy
+        uses: fifsky/ssh-action@master
+        with:
+          host: ${{ secrets.AWS_DEPLOY_HOST }}
+          user: ${{ secrets.AWS_DEPLOY_USER }}
+          key: ${{ secrets.AWS_DEPLOY_KEY }}
+          command: |
+            cd /home/ubuntu/ed-fusion/eddn
+
+            npm install
+            sudo systemctl restart eddn
