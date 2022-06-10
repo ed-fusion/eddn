@@ -22,7 +22,7 @@ jobs:
         uses: burnett01/rsync-deployments@5.2
         with:
           switches: -avzr --delete --exclude="" --include="" --filter=""
-          path: ./build/*
+          path: ./*
           remote_path: ${{ secrets.AWS_DEPLOY_PATH }}
           remote_host: ${{ secrets.AWS_DEPLOY_HOST }}
           remote_user: ${{ secrets.AWS_DEPLOY_USER }}
